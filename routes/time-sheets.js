@@ -45,4 +45,26 @@ router.post('/clockin', checkToken, async (req, res) => {
     })
 })
 
+router.post('/clockout', checkToken, async (req, res) => {
+    let token = jwt.decode(req.token);
+    let date = new Date();
+    let currentDate = new Date(date.getFullYear(), date.getMonth(), date.getDate()+1);
+    TimeSheet.findOne({userId: token.id, "sheet.date": currentDate}).then((result) => {
+        console.log(result);
+        let lastSheet = result.sheet.pop();
+        console.log(lastSheet)
+        lastSheet.timeEntries[lastSheet.timeEntries.length - 1].clockOut = new Date().addHours(5);
+        result.sheet.push(lastSheet);
+        result.save();
+        res.sendStatus(200);
+    })
+})
+
+router.get('/', checkToken, async (req, res) => {
+    let token = jwt.decode(req.token);
+    TimeSheet.findOne({userId: token.id}).then((result) => {
+        res.send(result.sheet);
+    })
+})
+
 module.exports = router;
