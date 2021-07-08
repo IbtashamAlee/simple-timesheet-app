@@ -1,10 +1,22 @@
 var mongoose = require('mongoose');
 
 const TimeSheetSchema = mongoose.Schema({
-    timeSheet: [
+    userId: {
+        type: String,
+        required: true
+    },
+    sheet: [
         {
-            date: Date,
-            entries: []
+            date: {
+                type: Date,
+                required: true
+            },
+            timeEntries: [
+                {
+                    clockIn: Date,
+                    clockOut: Date
+                }
+            ]
         }
     ]
 })
