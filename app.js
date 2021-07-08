@@ -18,6 +18,7 @@ mongoose.connect(db, {
 
 
 var usersRouter = require('./routes/users');
+var timeSheetRouter = require('./routes/time-sheets');
 
 var app = express();
 
@@ -41,6 +42,7 @@ require("./stratgies/jwt-strategy")(passport);
 
 
 app.use('/users', usersRouter);
+app.use('/timesheet', timeSheetRouter);
 app.use((req, res, next) => {
     res.sendFile(path.join(__dirname, ".", "client-app/build", "index.html"));
 });
