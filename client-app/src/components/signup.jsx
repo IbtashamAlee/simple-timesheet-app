@@ -30,6 +30,7 @@ class SignUp extends React.Component{
                 alert('Account created. Please login to continue');
                 this.props.history.push('/')
         }).catch((err) => {
+            alert('User already exists!');
             this.setState({error_text: "User already exists!"})
 
         })
@@ -41,8 +42,10 @@ class SignUp extends React.Component{
                     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
                             <div className="sm:mx-auto sm:w-full sm:max-w-md mb-4">
-                                <img className="mx-auto h-12 w-auto"
-                                     src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg" alt="Workflow"/>
+                                <Link to="/">
+                                    <img className="mx-auto h-12 w-auto"
+                                         src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg" alt="Workflow"/>
+                                </Link>
                                 <h2 className="mt-6 text-center text-xl font-normal text-gray-900">
                                     Sign up to your account
                                 </h2>
