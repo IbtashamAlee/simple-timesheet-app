@@ -64,7 +64,7 @@ export default function Home() {
 
     function getDate(clockDate) {
         let date = new Date(clockDate);
-        return date.getDate() + "-" + date.getMonth() + "-" + date.getFullYear();
+        return date.getDate() + "-" + date.getMonth()+1 + "-" + date.getFullYear();
     }
 
     useEffect(() => {
