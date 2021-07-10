@@ -2,6 +2,7 @@ import React from "react";
 import {useEffect, useState} from "react";
 import Button from "@material-ui/core/Button";
 import Api from '../generics-services/api.js'
+import Header from "./header";
 
 export default function Home() {
     const [clockIn, setClockIn] = useState(false);
@@ -42,7 +43,6 @@ export default function Home() {
 
     function getTimeSheet() {
         Api.execute('/timesheet', 'get').then(res => {
-            console.log(res)
             setTimeSheets(res.data);
         }).catch(err => {
             console.log(err);
@@ -55,6 +55,16 @@ export default function Home() {
         }).catch(err => {
             console.log(err);
         })
+    }
+
+    function getTime(clockTime) {
+        let date = new Date(clockTime);
+        return date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+    }
+
+    function getDate(clockDate) {
+        let date = new Date(clockDate);
+        return date.getDate() + "-" + date.getMonth() + "-" + date.getFullYear();
     }
 
     useEffect(() => {
@@ -75,57 +85,65 @@ export default function Home() {
 
     return (
         <div>
-            <div className="flex justify-between max-w-4xl mx-auto">
-                <div>
-                    <label ref={hoursRef}>00</label>
-                    <label>:</label>
-                    <label ref={minutesRef}>00</label>
-                    <label>:</label>
-                    <label value="0" ref={secondsRef}>00</label>
+            <Header/>
+            <div className="max-w-5xl min-w-5xl mx-auto">
+                <div className="flex justify-between max-w-3xl min-w-3xl mx-auto mt-5">
+                    <div className="text-gray-500">
+                        Timer
+                        <div className="text-gray-900 font-medium text-3xl">
+                            <label ref={hoursRef}>00</label>
+                            <label>:</label>
+                            <label ref={minutesRef}>00</label>
+                            <label>:</label>
+                            <label value="0" ref={secondsRef}>00</label>
+                        </div>
+                    </div>
+                    <div className="my-2">
+                        {
+                            !clockIn ? <Button disabled={!!!localStorage.getItem("access_token")} color="primary" variant="contained" onClick={() => {setClockIn(true); clockTime('clockin');}}>Clock In</Button>: <Button color="primary" variant="contained" disabled={!!!localStorage.getItem("access_token")} onClick={() => {setClockIn(false); clockTime('clockout')}}>Clock Out</Button>
+                        }
+                    </div>
                 </div>
-                {
-                    !clockIn ? <Button onClick={() => {setClockIn(true); clockTime('clockin');}}>Clock In</Button>: <Button onClick={() => {setClockIn(false); clockTime('clockout')}}>Clock Out</Button>
-                }
-            </div>
-            <div className="flex flex-col mt-6 mx-10">
-                <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                    <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                        <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
-                                <tr>
-                                    <th
-                                        scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        Date
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        Clock In
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        Clock Out
-                                    </th>
-                                </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                {timeSheets.map((timesheet) => (
-                                    timesheet.timeEntries.map((timeEntry) => (
-                                        <tr key={timesheet._id}>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{timesheet.date}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{timeEntry.clockIn}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{timeEntry.clockOut}</td>
-                                        </tr>
-                                    ))
-                                ))}
-                                </tbody>
-                            </table>
+                <div className="flex flex-col mt-6 mx-10">
+                    <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                        <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                            <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-50">
+                                    <tr>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        >
+                                            Date
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        >
+                                            Clock In
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        >
+                                            Clock Out
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    {timeSheets.map((timesheet) => (
+                                        timesheet.timeEntries.map((timeEntry) => (
+                                            <tr key={timeEntry._id}>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{getDate(timesheet.date)}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTime(timeEntry.clockIn)}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getTime(timeEntry.clockOut)}</td>
+                                            </tr>
+                                        ))
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
