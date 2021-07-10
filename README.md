@@ -1,3 +1,20 @@
+# For testing the app you can do the following steps
+
+In the main project directory and client-app directory, you can run:
+
+### 1. `npm install`
+
+In main directory, you can run the following command to run the project:
+
+### 1. `npm run start-dev`
+
+Goto client-app directory and run:
+
+### 1. `npm run start`
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+
 ### Please describe your process for approaching the code challenge. What kind of planning did you do? Did your plans change as you began coding?
 
 First of all I thought the problem complexity for both frontend and backend. I understood the problem and thought about its hurdles that i could face while doing obviously some were known hurdles.
