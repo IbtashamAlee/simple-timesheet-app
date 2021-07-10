@@ -10,7 +10,7 @@ router.post("/signup", async (req, res) => {
     password: req.body.password
   });
 
-  await User.findOne({ username: newUser.email })
+  await User.findOne({ email: newUser.email })
       .then(async profile => {
         if (!profile) {
           bcrypt.hash(newUser.password, Math.random(), async (err, hash) => {
@@ -29,7 +29,7 @@ router.post("/signup", async (req, res) => {
             }
           });
         } else {
-          res.send("User already exists...");
+          res.status(409).send("User already exists...");
         }
       })
       .catch(err => {
