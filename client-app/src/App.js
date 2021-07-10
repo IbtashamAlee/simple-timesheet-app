@@ -10,7 +10,6 @@ import Header from "./components/header";
 function App() {
     return (
         <Router>
-            <Header/>
             <Switch>
                 <Route path="/not-found" component={NotFound}/>
                 <Route path="/signin" component={SignIn}/>

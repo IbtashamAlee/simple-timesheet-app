@@ -32,10 +32,13 @@ export default function Header() {
                     <Typography variant="h6" className={classes.title}>
                         Timesheet App
                     </Typography>
-                    {!localStorage.getItem('access_token') &&
+                    {!localStorage.getItem('access_token') ?
                     <Button color="inherit">
                         <Link to="/signin">Sign In</Link>
-                    </Button>
+                    </Button> :
+                        <Button color="inherit" onClick={() => {localStorage.clear()}}>
+                            <Link to="/">Sign Out</Link>
+                        </Button>
                     }
                 </Toolbar>
             </AppBar>
