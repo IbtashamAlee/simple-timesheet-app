@@ -1,52 +1,93 @@
-/* This example requires Tailwind CSS v2.0+ */
-import {Link} from "react-router-dom";
+import React from "react";
 import {useEffect, useState} from "react";
-import Api from '../generics-services/api';
 import Button from "@material-ui/core/Button";
+import Api from '../generics-services/api.js'
 
 export default function Home() {
-    const [matches, setMatches] = useState([]);
+    const [clockIn, setClockIn] = useState(false);
+    const [timeInterval, setTimeInterval] = useState();
+    const [timeSheets, setTimeSheets] = useState([]);
 
-    function getMatches() {
-        Api.get('/matches', 'get').then(res => {
-            setMatches(res.data);
+    const secondsRef = React.useRef();
+    const minutesRef = React.useRef();
+    let hoursRef = React.useRef();
+    var totalSeconds = 0;
+
+    function setTime()
+    {
+        totalSeconds = parseInt(secondsRef.current.getAttribute('value'));
+        ++totalSeconds;
+
+        localStorage.setItem('seconds', totalSeconds.toString());
+        secondsRef.current.setAttribute("value", pad(totalSeconds));
+
+        secondsRef.current.innerHTML = pad(totalSeconds%60);
+        minutesRef.current.innerHTML = pad(parseInt((totalSeconds/60)%60));
+        hoursRef.current.innerHTML = pad(parseInt((totalSeconds/60)/60))
+    }
+
+
+    function pad(val)
+    {
+        var valString = val + "";
+        if(valString.length < 2)
+        {
+            return "0" + valString;
+        }
+        else
+        {
+            return valString;
+        }
+    }
+
+    function getTimeSheet() {
+        Api.execute('/timesheet', 'get').then(res => {
+            console.log(res)
+            setTimeSheets(res.data);
+        }).catch(err => {
+            console.log(err);
+        })
+    }
+
+    function clockTime(clock) {
+        Api.execute('/timesheet/' + clock, 'post').then(res => {
+            console.log(res);
         }).catch(err => {
             console.log(err);
         })
     }
 
     useEffect(() => {
-        setTimeout(() => {
-            getMatches();
-        },1500)
-    },[])
+        if (localStorage.getItem('seconds')) {
+            totalSeconds = localStorage.getItem('seconds');
+            secondsRef.current.setAttribute("value", pad(totalSeconds));
+            secondsRef.current.innerHTML = pad(totalSeconds%60);
+            minutesRef.current.innerHTML = pad(parseInt((totalSeconds/60)%60));
+            hoursRef.current.innerHTML = pad(parseInt((totalSeconds/60)/60))
+        }
+        if(clockIn) {
+            setTimeInterval(setInterval(setTime, 1000));
+        } if (!clockIn) {
+            getTimeSheet();
+            clearInterval(timeInterval);
+        }
+    }, [clockIn]);
 
     return (
-        <div className="max-w-4xl mx-auto">
-            <div className="my-8 mx-5 flex justify-between">
+        <div>
+            <div className="flex justify-between max-w-4xl mx-auto">
                 <div>
-                    <h1 className="font-bold text-gray-900 text-2xl">All Matches</h1>
+                    <label ref={hoursRef}>00</label>
+                    <label>:</label>
+                    <label ref={minutesRef}>00</label>
+                    <label>:</label>
+                    <label value="0" ref={secondsRef}>00</label>
                 </div>
-                <div>
-                    {
-                        localStorage.getItem('access_token') ?
-                        <Button variant="contained"
-                                color="primary"
-                            type="button"
-                        >
-                            <Link to='/add-match'>Add Match</Link>
-                        </Button> :
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                type="button"
-                            >
-                                <Link to='/signin'>Sign in</Link>
-                            </Button>
-                    }
-                </div>
+                {
+                    !clockIn ? <Button onClick={() => {setClockIn(true); clockTime('clockin');}}>Clock In</Button>: <Button onClick={() => {setClockIn(false); clockTime('clockout')}}>Clock Out</Button>
+                }
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col mt-6 mx-10">
                 <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                         <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
@@ -57,36 +98,31 @@ export default function Home() {
                                         scope="col"
                                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
-                                        Team A
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        Team B
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        City
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
                                         Date
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    >
+                                        Clock In
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    >
+                                        Clock Out
                                     </th>
                                 </tr>
                                 </thead>
-                                <tbody>
-                                {matches && matches.map((match) => (
-                                    <tr key={match._id} >
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{match.teamA}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{match.teamB}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{match.city}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{match.date}</td>
-                                    </tr>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                {timeSheets.map((timesheet) => (
+                                    timesheet.timeEntries.map((timeEntry) => (
+                                        <tr key={timesheet._id}>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{timesheet.date}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{timeEntry.clockIn}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{timeEntry.clockOut}</td>
+                                        </tr>
+                                    ))
                                 ))}
                                 </tbody>
                             </table>

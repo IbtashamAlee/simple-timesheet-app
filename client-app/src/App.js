@@ -5,10 +5,12 @@ import Home from "./components/home";
 import NotFound from "./components/not-found";
 import SignIn from "./components/signin";
 import SignUp from "./components/signup";
+import Header from "./components/header";
 
 function App() {
     return (
         <Router>
+            <Header/>
             <Switch>
                 <Route path="/not-found" component={NotFound}/>
                 <Route path="/signin" component={SignIn}/>
