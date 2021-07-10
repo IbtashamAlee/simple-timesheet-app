@@ -5,16 +5,11 @@ let checkToken = require('../middlewares/token-checker')
 const jwt = require("jsonwebtoken");
 
 
-Date.prototype.addHours= function(h){
-    this.setHours(this.getHours()+h);
-    return this;
-}
-
 router.post('/clockin', checkToken, async (req, res) => {
     let token = jwt.decode(req.token);
     let date = new Date();
-    let currentDate = new Date(date.getFullYear(), date.getMonth(), date.getDate()+1);
-    let clockIn = new Date().addHours(5);
+    let currentDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    let clockIn = new Date();
 
     await TimeSheet.findOne({userId: token.id, "sheet.date": currentDate}).then(async (result) => {
         if (result === null) {
@@ -48,22 +43,34 @@ router.post('/clockin', checkToken, async (req, res) => {
 router.post('/clockout', checkToken, async (req, res) => {
     let token = jwt.decode(req.token);
     let date = new Date();
-    let currentDate = new Date(date.getFullYear(), date.getMonth(), date.getDate()+1);
+    let currentDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     TimeSheet.findOne({userId: token.id, "sheet.date": currentDate}).then((result) => {
         console.log(result);
         let lastSheet = result.sheet.pop();
         console.log(lastSheet)
-        lastSheet.timeEntries[lastSheet.timeEntries.length - 1].clockOut = new Date().addHours(5);
+        lastSheet.timeEntries[lastSheet.timeEntries.length - 1].clockOut = new Date();
         result.sheet.push(lastSheet);
-        result.save();
-        res.sendStatus(200);
+        result.save().then(() => {
+            res.sendStatus(200)
+        }).catch(()=> {
+            res.sendStatus(409);
+        });
     })
 })
 
 router.get('/', checkToken, async (req, res) => {
     let token = jwt.decode(req.token);
-    TimeSheet.findOne({userId: token.id}).then((result) => {
-        res.send(result.sheet);
+    TimeSheet.find({userId: token.id}).then((result) => {
+        let sheets = [];
+
+        for (let i = 0; i < result.length; i++) {
+            for (let j = 0; j < result[i].sheet.length; j++){
+                sheets.push(result[i].sheet[j]);
+            }
+        }
+        res.send(sheets);
+    }).catch(() => {
+        res.sendStatus(409);
     })
 })
 
