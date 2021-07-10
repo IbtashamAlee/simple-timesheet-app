@@ -78,7 +78,7 @@ export default function Home() {
         if(clockIn) {
             setTimeInterval(setInterval(setTime, 1000));
         } if (!clockIn) {
-            getTimeSheet();
+            setTimeout(getTimeSheet, 2000);
             clearInterval(timeInterval);
         }
     }, [clockIn]);
@@ -100,7 +100,9 @@ export default function Home() {
                     </div>
                     <div className="my-2">
                         {
-                            !clockIn ? <Button disabled={!!!localStorage.getItem("access_token")} color="primary" variant="contained" onClick={() => {setClockIn(true); clockTime('clockin');}}>Clock In</Button>: <Button color="primary" variant="contained" disabled={!!!localStorage.getItem("access_token")} onClick={() => {setClockIn(false); clockTime('clockout')}}>Clock Out</Button>
+                            !clockIn ?
+                                <Button disabled={!!!localStorage.getItem("access_token")} color="primary" variant="contained" onClick={() => {setClockIn(true); clockTime('clockin');}}>Clock In</Button>
+                                : <Button color="primary" variant="contained" disabled={!!!localStorage.getItem("access_token")} onClick={() => {setClockIn(false); clockTime('clockout')}}>Clock Out</Button>
                         }
                     </div>
                 </div>
