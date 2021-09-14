@@ -1,4 +1,4 @@
-# Test it here : http://simple-timesheet-app.herokuapp.com/
+# Test it here : https://simple-timesheet-app.herokuapp.com/
 
 # For testing the app you can do the following steps
 
