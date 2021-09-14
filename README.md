@@ -1,3 +1,5 @@
+# Test it here : http://simple-timesheet-app.herokuapp.com/
+
 # For testing the app you can do the following steps
 
 In the main project directory and client-app directory, you can run:
